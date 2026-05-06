@@ -248,7 +248,7 @@ function goPage(p){
     if(!fr.src||fr.src==='about:blank')fr.src='https://turanking.cl';
     return;
   }
-  }
+  
   closeMenu();
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
