@@ -240,8 +240,14 @@ function closeMenu(){document.getElementById('ham').classList.remove('open');doc
 function goPage(p){
   if(p==='ranking'){
     closeMenu();
-    window.open('https://turanking.cl','_blank');
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    document.getElementById('page-ranking').classList.add('active');
+    document.querySelectorAll('.sidebar-item').forEach(x=>x.classList.remove('active'));
+    document.getElementById('nav-ranking').classList.add('active');
+    const fr=document.getElementById('ranking-frame');
+    if(!fr.src||fr.src==='about:blank')fr.src='https://turanking.cl';
     return;
+  }
   }
   closeMenu();
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
