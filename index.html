@@ -104,6 +104,8 @@ body{font-family:'DM Sans',sans-serif;background:#f2f5fb;min-height:100vh}
   <div class="sidebar-divider"></div>
   <div class="sidebar-item" id="nav-nem" onclick="goPage('nem')"><span>📊</span> Calcula tu NEM</div>
   <div class="sidebar-item" id="nav-sim" onclick="goPage('sim')"><span>🎯</span> Simula tu puntaje</div>
+  <div class="sidebar-item" id="nav-notas" onclick="goPage('notas')"><span>📋</span> ¿Dónde veo mis notas?</div>
+  <div class="sidebar-item" id="nav-notas" onclick="goPage('notas')"><span>📋</span> ¿Dónde veo mis notas?</div>
   <div class="sidebar-item" id="nav-pond" onclick="goPage('pond')"><span>⚖️</span> Simula tu ponderación</div>
   <div class="sidebar-item" id="nav-ranking" onclick="goPage('ranking')"><span>🏆</span> Calcula tu Ranking</div>
   <div class="sidebar-divider"></div>
@@ -123,6 +125,8 @@ body{font-family:'DM Sans',sans-serif;background:#f2f5fb;min-height:100vh}
       <div class="home-card" onclick="goPage('sim')"><div class="hc-icon">🎯</div><div class="hc-title">Simula tu puntaje</div><div class="hc-sub">Por respuestas correctas</div></div>
       <div class="home-card" onclick="goPage('pond')"><div class="hc-icon">⚖️</div><div class="hc-title">Simula ponderación</div><div class="hc-sub">Personaliza los %</div></div>
       <div class="home-card ext" onclick="goPage('ranking')"><div class="hc-icon">🏆</div><div class="hc-title">Calcula tu Ranking</div><div class="hc-sub">Por colegio →</div></div>
+      <div class="home-card" onclick="goPage('notas')" style="grid-column:1/-1;border-top-color:#5a6e8c"><div class="hc-icon">📋</div><div class="hc-title">¿Dónde veo mis notas?</div><div class="hc-sub">Guía para obtenerlas en el Mineduc</div></div>
+      <div class="home-card" onclick="goPage('notas')" style="grid-column:1/-1;border-top-color:#5a6e8c"><div class="hc-icon">📋</div><div class="hc-title">¿Dónde veo mis notas?</div><div class="hc-sub">Guía para obtenerlas en el Mineduc</div></div>
     </div>
   </div>
   <div class="footer-bar">
@@ -216,6 +220,125 @@ body{font-family:'DM Sans',sans-serif;background:#f2f5fb;min-height:100vh}
       <div class="pr-score" id="pond-val">—</div>
     </div>
   </div>
+  <div class="footer-bar">
+    <a href="https://instagram.com/umbral_uc" target="_blank">@umbral_uc</a>
+    <a href="mailto:umbraluc2026@gmail.com">umbraluc2026@gmail.com</a>
+  </div>
+</div>
+
+<!-- NOTAS -->
+<div class="page" id="page-notas">
+  <div class="section-title">¿Dónde veo mis notas?</div>
+  <div class="section-sub">Guía para obtener tus promedios en el portal oficial del Mineduc</div>
+
+  <div class="card">
+    <div class="card-label">Cómo obtener tus promedios</div>
+    <div style="display:flex;flex-direction:column;gap:1rem">
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#003087;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">1</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#003087;margin-bottom:3px">Ingresa al portal de certificados</div>
+          <div style="font-size:13px;color:#5a6e8c">Ve a <strong>certificados.mineduc.cl</strong> — es gratis y no necesitas Clave Única.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#003087;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">2</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#003087;margin-bottom:3px">Haz clic en "Certificados de Estudio"</div>
+          <div style="font-size:13px;color:#5a6e8c">Esa opción aparece en la pantalla principal del portal.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#003087;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">3</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#003087;margin-bottom:3px">Ingresa tus datos</div>
+          <div style="font-size:13px;color:#5a6e8c">Escribe tu <strong>RUN</strong>, <strong>fecha de nacimiento</strong> y <strong>correo electrónico</strong> (opcional). Luego haz clic en "Buscar".</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#003087;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">4</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#003087;margin-bottom:3px">Selecciona cada año de enseñanza media</div>
+          <div style="font-size:13px;color:#5a6e8c">Aparecerán tus certificados disponibles. Abre el de <strong>1°, 2°, 3° y 4° Medio</strong> uno por uno.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#003087;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">5</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#003087;margin-bottom:3px">Busca el promedio general</div>
+          <div style="font-size:13px;color:#5a6e8c">En cada certificado aparece el <strong>promedio anual</strong> del año. Anota ese número para cada año.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#c8a951;color:#003087;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">✓</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#003087;margin-bottom:3px">¡Listo! Vuelve a calcular tu NEM</div>
+          <div style="font-size:13px;color:#5a6e8c">Con los 4 promedios anotados, entra a <strong>Calcula tu NEM</strong> y obtendrás tu puntaje oficial.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="background:#e8eef7;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;font-size:13px;color:#5a6e8c;line-height:1.6">
+    💡 <strong style="color:#003087">¿No aparecen tus certificados?</strong> Si estudiaste antes del 2005 o hay cursos sin registrar, debes acudir presencialmente a una oficina <strong>Ayuda Mineduc</strong> con tu cédula de identidad.
+  </div>
+
+  <a href="https://certificados.mineduc.cl" target="_blank" style="display:block;width:100%;padding:13px;background:#003087;color:#fff;font-family:'DM Sans',sans-serif;font-weight:600;font-size:15px;border:none;border-radius:10px;cursor:pointer;text-align:center;text-decoration:none;margin-bottom:1rem;box-sizing:border-box">
+    Ir a certificados.mineduc.cl →
+  </a>
+  <button class="btn-main" onclick="goPage('nem')" style="margin-top:0">Calcular mi NEM →</button>
+
+  <div class="footer-bar">
+    <a href="https://instagram.com/umbral_uc" target="_blank">@umbral_uc</a>
+    <a href="mailto:umbraluc2026@gmail.com">umbraluc2026@gmail.com</a>
+  </div>
+</div>
+
+<!-- NOTAS -->
+<div class="page" id="page-notas">
+  <div class="section-title">¿Dónde veo mis notas?</div>
+  <div class="section-sub">Guía para obtener tus promedios en el portal oficial del Mineduc</div>
+  <div class="card">
+    <div class="card-label">Pasos a seguir</div>
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#003087;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">1</div>
+        <div style="font-size:13px;color:#5a6e8c;line-height:1.6">Ve a <a href="https://certificados.mineduc.cl" target="_blank" style="color:#003087;font-weight:600;text-decoration:underline">certificados.mineduc.cl</a> — es gratis y no necesitas Clave Única.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#003087;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">2</div>
+        <div style="font-size:13px;color:#5a6e8c;line-height:1.6">Haz clic en <strong style="color:#003087">"Certificados de Estudio"</strong>.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#003087;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">3</div>
+        <div style="font-size:13px;color:#5a6e8c;line-height:1.6">Ingresa tu <strong style="color:#003087">RUN</strong>, <strong style="color:#003087">fecha de nacimiento</strong> y correo electrónico (opcional). Haz clic en "Buscar".</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#003087;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">4</div>
+        <div style="font-size:13px;color:#5a6e8c;line-height:1.6">Selecciona el certificado de <strong style="color:#003087">1°, 2°, 3° y 4° Medio</strong> uno por uno.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#003087;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">5</div>
+        <div style="font-size:13px;color:#5a6e8c;line-height:1.6">En cada certificado busca el <strong style="color:#003087">promedio anual</strong> y anótalo.</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:28px;height:28px;background:#c8a951;color:#003087;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">✓</div>
+        <div style="font-size:13px;color:#5a6e8c;line-height:1.6">Con los 4 promedios anotados, vuelve a <strong style="color:#003087">Calcula tu NEM</strong> e ingrésalos.</div>
+      </div>
+    </div>
+  </div>
+  <div style="background:#e8eef7;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;font-size:13px;color:#5a6e8c;line-height:1.6">
+    💡 <strong style="color:#003087">¿No aparecen tus certificados?</strong> Si estudiaste antes del 2005 o hay cursos sin registrar, debes ir presencialmente a una oficina <strong>Ayuda Mineduc</strong> con tu cédula de identidad.
+  </div>
+  <a href="https://certificados.mineduc.cl" target="_blank" style="display:block;width:100%;padding:13px;background:#003087;color:#fff;font-family:'DM Sans',sans-serif;font-weight:600;font-size:15px;border-radius:10px;text-align:center;text-decoration:none;margin-bottom:1rem;box-sizing:border-box">Ir a certificados.mineduc.cl →</a>
+  <button class="btn-main" onclick="goPage('nem')" style="margin-top:0">Calcular mi NEM →</button>
   <div class="footer-bar">
     <a href="https://instagram.com/umbral_uc" target="_blank">@umbral_uc</a>
     <a href="mailto:umbraluc2026@gmail.com">umbraluc2026@gmail.com</a>
