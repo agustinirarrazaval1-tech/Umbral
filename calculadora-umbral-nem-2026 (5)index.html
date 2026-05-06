@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Umbral</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f2f5fb;min-height:100vh}
+.app{position:relative;overflow:hidden;min-height:100vh}
+.topbar{background:#003087;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;position:sticky;top:0;z-index:20}
+.topbar-title{font-family:'Playfair Display',Georgia,serif;font-size:16px;font-weight:700;color:#fff}
+.hamburger{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:4px}
+.hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .3s}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.sidebar{position:fixed;top:0;left:-280px;width:260px;height:100%;background:#003087;z-index:30;transition:left .3s ease;padding-top:52px;box-shadow:4px 0 20px rgba(0,0,0,0.2)}
+.sidebar.open{left:0}
+.sidebar-item{display:flex;align-items:center;gap:12px;padding:16px 24px;color:rgba(255,255,255,0.8);font-size:15px;cursor:pointer;border-left:3px solid transparent;transition:all .2s}
+.sidebar-item:hover,.sidebar-item.active{color:#fff;background:rgba(255,255,255,0.08);border-left-color:#c8a951}
+.sidebar-divider{height:1px;background:rgba(255,255,255,0.1);margin:8px 16px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:25;display:none}
+.overlay.show{display:block}
+.page{display:none;padding:1.5rem 1.25rem 2rem;animation:fadeIn .3s ease;min-height:calc(100vh - 52px)}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.home-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 120px);text-align:center;gap:1.5rem}
+.home-title{font-family:'Playfair Display',Georgia,serif;font-size:32px;font-weight:700;color:#003087}
+.home-title em{font-style:normal;color:#c8a951}
+.home-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px}
+.home-card{background:#fff;border:1px solid #d0daea;border-radius:12px;padding:14px 12px;cursor:pointer;text-align:left;transition:border-color .2s,box-shadow .2s;border-top:3px solid #003087}
+.home-card:hover{border-color:#003087;box-shadow:0 4px 16px rgba(0,48,135,0.12)}
+.home-card .hc-icon{font-size:20px;margin-bottom:6px}
+.home-card .hc-title{font-size:13px;font-weight:600;color:#003087}
+.home-card .hc-sub{font-size:11px;color:#5a6e8c;margin-top:2px}
+.home-card.ext{border-top-color:#c8a951}
+
+.section-title{font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:700;color:#003087;margin-bottom:.25rem}
+.section-sub{font-size:13px;color:#5a6e8c;margin-bottom:1.25rem}
+.card{background:#fff;border:1px solid #d0daea;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 8px rgba(0,48,135,0.05)}
+.card-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5a6e8c;margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+.card-label::before{content:'';width:3px;height:14px;background:#c8a951;border-radius:2px;display:block}
+.grupo-sel{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.gb{border:1.5px solid #d0daea;border-radius:8px;padding:10px 6px;background:#f2f5fb;cursor:pointer;text-align:center;font-family:'DM Sans',sans-serif;transition:all .2s}
+.gb .gl{font-size:12px;font-weight:600;color:#003087}
+.gb .gd{font-size:10px;color:#5a6e8c;margin-top:2px}
+.gb.active{border-color:#003087;background:#e8eef7}
+.gdesc{font-size:12px;color:#5a6e8c;padding:8px 10px;background:#f2f5fb;border-radius:8px;margin-bottom:1rem;line-height:1.5}
+.grade-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;font-weight:600;color:#003087;letter-spacing:.04em;text-transform:uppercase}
+.field input{background:#f2f5fb;border:1.5px solid #d0daea;border-radius:8px;padding:9px 12px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;color:#0d1f3c;width:100%;-webkit-appearance:none}
+.field input:focus{outline:none;border-color:#1a4ba0;background:#fff}
+.field input.err{border-color:#c0392b;background:#fff5f5}
+.fh{font-size:10px;color:#c0392b;min-height:13px}
+.btn-main{width:100%;padding:13px;background:#003087;color:#fff;font-family:'DM Sans',sans-serif;font-weight:600;font-size:15px;border:none;border-radius:10px;cursor:pointer;margin-top:.75rem;transition:background .2s}
+.btn-main:hover{background:#1a4ba0}
+.result-hero{background:#003087;border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1rem}
+.rh-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#c8a951;margin-bottom:.25rem}
+.rh-score{font-family:'Playfair Display',Georgia,serif;font-size:52px;font-weight:700;color:#fff;line-height:1}
+.rh-avg{font-size:13px;color:rgba(255,255,255,0.5);margin-top:.25rem}
+.bar-hdr{display:flex;justify-content:space-between;font-size:11px;color:#5a6e8c;margin-bottom:4px}
+.bar-track{background:#e8eef7;border-radius:100px;height:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:100px;background:#003087;transition:width 1s ease;width:0%}
+.pct-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.pct-row label{font-size:12px;color:#0d1f3c;flex:1;font-weight:500}
+.pct-total{font-size:13px;font-weight:600;padding:8px 12px;border-radius:8px;text-align:center;margin:8px 0}
+.pct-ok{background:#e8f5e9;color:#2e7d32}
+.pct-err{background:#ffebee;color:#c0392b}
+.pond-result{background:#003087;border-radius:12px;padding:1.25rem;text-align:center;margin-top:1rem}
+.pond-result .pr-label{font-size:11px;color:#c8a951;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.25rem}
+.pond-result .pr-score{font-family:'Playfair Display',Georgia,serif;font-size:48px;font-weight:700;color:#fff;line-height:1}
+.footer-bar{background:#003087;padding:1rem 1.25rem;text-align:center;margin-top:1rem}
+.footer-bar a{color:rgba(255,255,255,0.6);font-size:12px;text-decoration:none;margin:0 8px}
+.footer-bar a:hover{color:#c8a951}
+
+/* iframe ranking page */
+.ranking-topbar{background:#003087;height:52px;display:flex;align-items:center;gap:12px;padding:0 1.25rem;position:sticky;top:0;z-index:10}
+.btn-volver{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:6px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s}
+.btn-volver:hover{background:rgba(255,255,255,0.25)}
+.ranking-iframe{width:100%;border:none;height:calc(100vh - 104px);display:block}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <button class="hamburger" id="ham" aria-label="menú" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="topbar-title">Calculadora Umbral</div>
+  <div style="width:30px"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item active" id="nav-home" onclick="goPage('home')">
+    <span>🏠</span> Inicio
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-item" id="nav-nem" onclick="goPage('nem')">
+    <span>📊</span> Calcula tu NEM
+  </div>
+  <div class="sidebar-item" id="nav-pond" onclick="goPage('pond')">
+    <span>⚖️</span> Simula tu ponderación
+  </div>
+  <div class="sidebar-item" id="nav-ranking" onclick="goPage('ranking')">
+    <span>🏆</span> Calcula tu Ranking
+  </div>
+  <div class="sidebar-divider"></div>
+  <div style="padding:16px 24px">
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Contacto</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:4px">@umbral_uc</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.6)">umbraluc2026@gmail.com</div>
+  </div>
+</div>
+
+<!-- INICIO -->
+<div class="page active" id="page-home">
+  <div class="home-page">
+    <div class="home-title">Umbral <em>UC</em></div>
+    <div class="home-cards">
+      <div class="home-card" onclick="goPage('nem')">
+        <div class="hc-icon">📊</div>
+        <div class="hc-title">Calcula tu NEM</div>
+        <div class="hc-sub">Tablas oficiales DEMRE</div>
+      </div>
+      <div class="home-card" onclick="goPage('pond')">
+        <div class="hc-icon">⚖️</div>
+        <div class="hc-title">Simula ponderación</div>
+        <div class="hc-sub">Personaliza los %</div>
+      </div>
+      <div class="home-card ext" onclick="goPage('ranking')" style="grid-column:1/-1">
+        <div class="hc-icon">🏆</div>
+        <div class="hc-title">Calcula tu Ranking</div>
+        <div class="hc-sub">Consulta tu ranking por colegio →</div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <a href="https://instagram.com/umbral_uc" target="_blank">@umbral_uc</a>
+    <a href="mailto:umbraluc2026@gmail.com">umbraluc2026@gmail.com</a>
+  </div>
+</div>
+
+<!-- NEM -->
+<div class="page" id="page-nem">
+  <div class="section-title">Calcula tu NEM</div>
+  <div class="section-sub">Tablas oficiales DEMRE · Proceso Admisión 2026</div>
+  <div class="card">
+    <div class="card-label">Tipo de enseñanza</div>
+    <div class="grupo-sel">
+      <button class="gb active" onclick="setG('A',this)"><div class="gl">Grupo A</div><div class="gd">HC Diurna</div></button>
+      <button class="gb" onclick="setG('B',this)"><div class="gl">Grupo B</div><div class="gd">HC Adultos</div></button>
+      <button class="gb" onclick="setG('C',this)"><div class="gl">Grupo C</div><div class="gd">Técnico Prof.</div></button>
+    </div>
+    <div class="gdesc" id="gdesc">Enseñanza Media HC diurna, promoción anual y Escuela Naval.</div>
+    <div class="card-label">Promedios por año (4.0 – 7.0)</div>
+    <div class="grade-grid">
+      <div class="field"><label>1° Medio</label><input type="number" id="g1" placeholder="ej. 5.8" min="4" max="7" step="0.01"><span class="fh" id="e1"></span></div>
+      <div class="field"><label>2° Medio</label><input type="number" id="g2" placeholder="ej. 6.1" min="4" max="7" step="0.01"><span class="fh" id="e2"></span></div>
+      <div class="field"><label>3° Medio</label><input type="number" id="g3" placeholder="ej. 5.5" min="4" max="7" step="0.01"><span class="fh" id="e3"></span></div>
+      <div class="field"><label>4° Medio</label><input type="number" id="g4" placeholder="ej. 6.3" min="4" max="7" step="0.01"><span class="fh" id="e4"></span></div>
+    </div>
+    <button class="btn-main" onclick="calcNEM()">Calcular NEM →</button>
+  </div>
+  <div id="nem-result" style="display:none">
+    <div class="result-hero">
+      <div class="rh-label">Tu puntaje NEM</div>
+      <div class="rh-score" id="nem-val">—</div>
+      <div class="rh-avg" id="nem-avg-txt"></div>
+    </div>
+    <div class="card">
+      <div class="bar-hdr"><span>100 pts</span><span>1000 pts</span></div>
+      <div class="bar-track"><div class="bar-fill" id="bar-nem"></div></div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <a href="https://instagram.com/umbral_uc" target="_blank">@umbral_uc</a>
+    <a href="mailto:umbraluc2026@gmail.com">umbraluc2026@gmail.com</a>
+  </div>
+</div>
+
+<!-- PONDERACION -->
+<div class="page" id="page-pond">
+  <div class="section-title">Simula tu ponderación</div>
+  <div class="section-sub">Edita los porcentajes según la carrera que te interesa</div>
+  <div class="card">
+    <div class="card-label">Puntajes y ponderaciones</div>
+    <div style="display:grid;grid-template-columns:1fr 70px 70px;gap:6px;margin-bottom:8px">
+      <div style="font-size:11px;color:#5a6e8c;font-weight:600">Prueba</div>
+      <div style="font-size:11px;color:#5a6e8c;font-weight:600;text-align:center">Puntaje</div>
+      <div style="font-size:11px;color:#5a6e8c;font-weight:600;text-align:center">%</div>
+    </div>
+    <div id="pond-rows"></div>
+    <div class="pct-total pct-err" id="pct-total">Total: 0%</div>
+    <button class="btn-main" onclick="calcPond()">Calcular puntaje ponderado →</button>
+  </div>
+  <div id="pond-result-box" style="display:none">
+    <div class="pond-result">
+      <div class="pr-label">Puntaje ponderado</div>
+      <div class="pr-score" id="pond-val">—</div>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <a href="https://instagram.com/umbral_uc" target="_blank">@umbral_uc</a>
+    <a href="mailto:umbraluc2026@gmail.com">umbraluc2026@gmail.com</a>
+  </div>
+</div>
+
+
+
+</div>
+
+<script>
+const GDESC={A:'Enseñanza Media HC diurna, promoción anual y Escuela Naval.',B:'HC de adultos. Establecimientos vespertinos/nocturnos y alumnos libres.',C:'Técnico Profesional — Comercial, Industrial, Técnica, Agrícola y Marítima.'};
+let grupo='A';
+
+function toggleMenu(){document.getElementById('ham').classList.toggle('open');document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+function closeMenu(){document.getElementById('ham').classList.remove('open');document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+function goPage(p){
+  closeMenu();
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(x=>x.classList.remove('active'));
+  const ni=document.getElementById('nav-'+p);if(ni)ni.classList.add('active');
+  if(p==='ranking'){
+    window.open('https://turanking.cl','_blank');
+    return;
+  }
+}
+function setG(g,btn){grupo=g;document.querySelectorAll('.gb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('gdesc').textContent=GDESC[g];}
+
+const TA={400:100,401:103,402:105,403:109,404:112,405:115,406:118,407:122,408:124,409:128,410:131,411:135,412:137,413:140,414:144,415:146,416:150,417:153,418:157,419:159,420:163,421:166,422:169,423:172,424:176,425:178,426:181,427:185,428:187,429:191,430:194,431:198,432:200,433:204,434:207,435:211,436:213,437:216,438:220,439:222,440:226,441:229,442:232,443:235,444:239,445:241,446:245,447:248,448:252,449:254,450:257,451:261,452:263,453:267,454:270,455:274,456:276,457:280,458:283,459:286,460:289,461:292,462:295,463:298,464:302,465:304,466:308,467:311,468:315,469:317,470:321,471:324,472:328,473:330,474:333,475:337,476:339,477:343,478:346,479:349,480:352,481:356,482:358,483:362,484:365,485:367,486:371,487:374,488:378,489:380,490:384,491:387,492:391,493:393,494:397,495:400,496:403,497:406,498:409,499:412,500:415,501:419,502:421,503:425,504:428,505:432,506:434,507:438,508:441,509:443,510:447,511:450,512:454,513:456,514:460,515:463,516:466,517:469,518:473,519:475,520:479,521:482,522:484,523:488,524:491,525:495,526:497,527:501,528:504,529:508,530:510,531:514,532:517,533:519,534:523,535:526,536:529,537:532,538:536,539:538,540:542,541:545,542:549,543:551,544:555,545:558,546:560,547:564,548:567,549:569,550:572,551:574,552:577,553:580,554:583,555:586,556:589,557:591,558:594,559:596,560:599,561:603,562:605,563:608,564:610,565:613,566:617,567:619,568:622,569:625,570:628,571:631,572:634,573:636,574:639,575:643,576:645,577:648,578:650,579:654,580:657,581:659,582:662,583:664,584:668,585:671,586:673,587:676,588:680,589:682,590:685,591:688,592:690,593:694,594:697,595:699,596:702,597:706,598:708,599:711,600:713,601:716,602:720,603:722,604:725,605:727,606:731,607:734,608:736,609:739,610:742,611:745,612:748,613:751,614:753,615:757,616:760,617:762,618:765,619:767,620:771,621:774,622:776,623:779,624:783,625:785,626:788,627:790,628:793,629:797,630:799,631:802,632:805,633:808,634:811,635:814,636:816,637:819,638:823,639:825,640:828,641:830,642:834,643:837,644:839,645:842,646:844,647:848,648:851,649:853,650:856,651:860,652:862,653:865,654:868,655:870,656:874,657:877,658:879,659:882,660:886,661:888,662:891,663:893,664:896,665:900,666:902,667:905,668:907,669:911,670:914,671:916,672:919,673:922,674:925,675:928,676:931,677:933,678:937,679:940,680:942,681:945,682:947,683:951,684:954,685:956,686:959,687:963,688:965,689:968,690:970,691:973,692:977,693:979,694:982,695:985,696:988,697:991,698:994,699:996,700:1000};
+const TB={400:100,401:103,402:105,403:109,404:112,405:115,406:118,407:122,408:124,409:128,410:131,411:135,412:137,413:141,414:144,415:148,416:150,417:154,418:157,419:160,420:163,421:167,422:169,423:173,424:176,425:180,426:182,427:186,428:189,429:193,430:195,431:199,432:202,433:205,434:208,435:212,436:214,437:218,438:221,439:225,440:227,441:231,442:234,443:236,444:240,445:243,446:247,447:249,448:253,449:256,450:259,451:262,452:266,453:268,454:272,455:275,456:279,457:281,458:285,459:288,460:292,461:294,462:298,463:301,464:304,465:307,466:311,467:313,468:317,469:320,470:324,471:326,472:330,473:333,474:337,475:339,476:343,477:346,478:349,479:352,480:356,481:358,482:362,483:365,484:369,485:371,486:374,487:378,488:380,489:384,490:387,491:391,492:393,493:397,494:400,495:403,496:406,497:410,498:412,499:416,500:419,501:423,502:425,503:429,504:432,505:436,506:438,507:442,508:445,509:448,510:451,511:455,512:457,513:461,514:464,515:468,516:470,517:474,518:477,519:481,520:483,521:487,522:490,523:493,524:496,525:500,526:502,527:505,528:509,529:511,530:515,531:518,532:522,533:524,534:528,535:531,536:535,537:537,538:541,539:544,540:547,541:550,542:554,543:556,544:560,545:563,546:567,547:569,548:572,549:574,550:577,551:580,552:582,553:585,554:587,555:590,556:592,557:595,558:598,559:600,560:604,561:607,562:609,563:612,564:614,565:618,566:621,567:623,568:626,569:628,570:632,571:635,572:637,573:640,574:643,575:646,576:649,577:652,578:654,579:657,580:661,581:663,582:666,583:668,584:671,585:675,586:677,587:680,588:682,589:685,590:689,591:691,592:694,593:697,594:699,595:703,596:706,597:708,598:711,599:713,600:717,601:720,602:722,603:725,604:727,605:731,606:734,607:736,608:739,609:742,610:745,611:748,612:751,613:753,614:756,615:760,616:762,617:765,618:767,619:770,620:774,621:776,622:779,623:781,624:784,625:788,626:790,627:793,628:796,629:798,630:802,631:805,632:807,633:810,634:812,635:816,636:819,637:821,638:824,639:826,640:830,641:833,642:835,643:838,644:841,645:844,646:847,647:850,648:852,649:855,650:859,651:861,652:864,653:866,654:869,655:873,656:875,657:878,658:880,659:883,660:887,661:889,662:892,663:895,664:897,665:901,666:904,667:906,668:909,669:911,670:915,671:918,672:920,673:923,674:925,675:929,676:932,677:934,678:937,679:940,680:943,681:946,682:949,683:951,684:954,685:958,686:960,687:963,688:965,689:968,690:972,691:974,692:977,693:979,694:982,695:986,696:988,697:991,698:994,699:996,700:1000};
+const TC={400:100,401:103,402:105,403:109,404:112,405:115,406:118,407:122,408:124,409:128,410:131,411:135,412:137,413:141,414:144,415:148,416:150,417:154,418:157,419:160,420:163,421:166,422:169,423:172,424:176,425:178,426:182,427:185,428:189,429:191,430:195,431:198,432:202,433:204,434:208,435:211,436:214,437:217,438:221,439:223,440:226,441:230,442:232,443:236,444:239,445:243,446:245,447:249,448:252,449:256,450:258,451:262,452:265,453:268,454:271,455:275,456:277,457:281,458:284,459:286,460:290,461:293,462:297,463:299,464:303,465:306,466:310,467:312,468:316,469:319,470:322,471:325,472:329,473:331,474:335,475:338,476:342,477:344,478:347,479:351,480:353,481:357,482:360,483:364,484:366,485:370,486:373,487:376,488:379,489:383,490:385,491:389,492:392,493:396,494:398,495:402,496:405,497:409,498:411,499:414,500:418,501:420,502:424,503:427,504:430,505:433,506:437,507:439,508:443,509:446,510:450,511:452,512:456,513:459,514:463,515:465,516:469,517:472,518:474,519:478,520:481,521:484,522:487,523:491,524:493,525:497,526:500,527:504,528:506,529:510,530:513,531:517,532:519,533:523,534:526,535:529,536:532,537:535,538:538,539:541,540:545,541:547,542:551,543:554,544:558,545:560,546:564,547:567,548:571,549:572,550:574,551:577,552:580,553:582,554:585,555:587,556:590,557:592,558:595,559:598,560:601,561:604,562:607,563:609,564:613,565:616,566:618,567:621,568:623,569:627,570:630,571:632,572:635,573:637,574:641,575:644,576:646,577:649,578:652,579:655,580:658,581:661,582:663,583:667,584:670,585:672,586:675,587:677,588:681,589:684,590:686,591:689,592:691,593:695,594:698,595:700,596:703,597:707,598:709,599:712,600:715,601:717,602:721,603:724,604:726,605:729,606:731,607:735,608:738,609:740,610:743,611:747,612:749,613:752,614:754,615:757,616:761,617:763,618:766,619:769,620:771,621:775,622:778,623:780,624:783,625:787,626:789,627:792,628:794,629:797,630:801,631:803,632:806,633:808,634:811,635:815,636:817,637:820,638:823,639:825,640:829,641:832,642:834,643:837,644:841,645:843,646:846,647:848,648:851,649:855,650:857,651:860,652:862,653:865,654:869,655:871,656:874,657:877,658:880,659:883,660:886,661:888,662:891,663:895,664:897,665:900,666:902,667:905,668:909,669:911,670:914,671:916,672:920,673:923,674:925,675:928,676:931,677:934,678:937,679:940,680:942,681:945,682:949,683:951,684:954,685:956,686:960,687:963,688:965,689:968,690:970,691:974,692:977,693:979,694:982,695:985,696:988,697:991,698:994,699:996,700:1000};
+const TABS={A:TA,B:TB,C:TC};
+function lookup(avg,g){const t=TABS[g];const k=Math.round(avg*100);if(t[k]!==undefined)return t[k];for(let i=k;i>=400;i--)if(t[i]!==undefined)return t[i];return 100;}
+function v(id){return document.getElementById(id);}
+function calcNEM(){
+  let ok=true;
+  const ids=['g1','g2','g3','g4'],eids=['e1','e2','e3','e4'],vals=[];
+  ids.forEach((id,i)=>{const val=parseFloat(v(id).value);if(isNaN(val)||val<4||val>7){v(id).classList.add('err');v(eids[i]).textContent='Entre 4.0 y 7.0';ok=false;}else{v(id).classList.remove('err');v(eids[i]).textContent='';vals.push(val);}});
+  if(!ok)return;
+  const avg=vals.reduce((a,b)=>a+b,0)/4;
+  const nem=lookup(avg,grupo);
+  v('nem-val').textContent=nem;
+  v('nem-avg-txt').textContent='promedio: '+avg.toFixed(2);
+  v('nem-result').style.display='block';
+  setTimeout(()=>{v('bar-nem').style.width=Math.round((nem-100)/900*100)+'%';},80);
+}
+const PRUEBAS=[{id:'lect',label:'Competencia Lectora',pct:20},{id:'m1',label:'Matemática 1 (M1)',pct:20},{id:'m2',label:'Matemática 2 (M2)',pct:0},{id:'hist',label:'Historia y Cs. Sociales',pct:0},{id:'cien',label:'Ciencias',pct:0},{id:'nem2',label:'NEM',pct:10},{id:'rank',label:'Ranking',pct:10}];
+function buildPondRows(){
+  const cont=v('pond-rows');cont.innerHTML='';
+  PRUEBAS.forEach(p=>{
+    const row=document.createElement('div');row.className='pct-row';
+    row.innerHTML=`<label>${p.label}</label><input type="number" id="ps-${p.id}" value="" min="100" max="1000" placeholder="—" style="width:70px;border:1.5px solid #d0daea;border-radius:6px;padding:5px 8px;font-size:13px;text-align:center;font-family:'DM Sans',sans-serif;background:#f2f5fb"><input type="number" id="pp-${p.id}" value="${p.pct}" min="0" max="100" style="width:64px;border:1.5px solid #d0daea;border-radius:6px;padding:5px 8px;font-size:13px;text-align:center;font-family:'DM Sans',sans-serif;background:#f2f5fb" onchange="updateTotal()">`;
+    cont.appendChild(row);
+  });updateTotal();
+}
+function updateTotal(){let total=0;PRUEBAS.forEach(p=>{const el=v('pp-'+p.id);if(el)total+=parseFloat(el.value)||0;});total=Math.round(total);const el=v('pct-total');el.textContent='Total: '+total+'%';el.className='pct-total '+(total===100?'pct-ok':'pct-err');}
+function calcPond(){
+  let total=0;PRUEBAS.forEach(p=>{const el=v('pp-'+p.id);if(el)total+=parseFloat(el.value)||0;});
+  if(Math.round(total)!==100){v('pct-total').textContent='Los % deben sumar exactamente 100% (ahora suman '+Math.round(total)+'%)';v('pct-total').className='pct-total pct-err';v('pond-result-box').style.display='none';return;}
+  let pond=0;PRUEBAS.forEach(p=>{const score=parseFloat(v('ps-'+p.id).value)||0;const pct=(parseFloat(v('pp-'+p.id).value)||0)/100;pond+=score*pct;});
+  v('pond-val').textContent=Math.round(pond);v('pond-result-box').style.display='block';
+}
+buildPondRows();
+</script>
+</body>
+</html>
