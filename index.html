@@ -208,7 +208,16 @@ body{font-family:'DM Sans',sans-serif;background:#f2f5fb;min-height:100vh}
     <button onclick="goPage('home')" style="background:none;border:1.5px solid #d0daea;border-radius:8px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#003087;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .2s" onmouseover="this.style.background='#003087';this.style.color='#fff'" onmouseout="this.style.background='none';this.style.color='#003087'">← Inicio</button>
   </div>
   <div class="section-title">Simula tu ponderación</div>
-  <div class="section-sub">Edita los porcentajes según la carrera que te interesa</div>
+  <div class="section-sub">Busca tu carrera o edita los porcentajes manualmente</div>
+
+  <div class="card" style="margin-bottom:1rem">
+    <div class="card-label">Buscar carrera</div>
+    <div style="position:relative;margin-bottom:.75rem">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#5a6e8c">🔍</span>
+      <input type="text" id="carrera-search" placeholder="Ej: Medicina UC, Derecho, Ingeniería..." oninput="filtrarCarreras()" style="width:100%;background:#f2f5fb;border:1.5px solid #d0daea;border-radius:8px;padding:10px 12px 10px 36px;font-size:14px;font-family:'DM Sans',sans-serif;color:#0d1f3c">
+    </div>
+    <div id="carrera-results" style="display:none;max-height:220px;overflow-y:auto;border:1px solid #d0daea;border-radius:8px;background:#fff"></div>
+  </div>
   <button class="btn-usar" id="btn-usar" onclick="cargarGuardados()">📂 Usar mis últimos puntajes calculados</button>
   <div class="card">
     <div class="card-label">Puntajes y ponderaciones</div>
@@ -505,6 +514,142 @@ function cargarGuardados(){
     v('btn-usar').style.borderColor='#2e7d32';
   }catch(e){}
 }
+const DB=[
+  {n:"Actuación",u:"UC",lect:16,m1:10,hist:10,cien:0,m2:0,nem:12,rank:12,nota:"Requiere prueba especial (40%)"},
+  {n:"Administración Pública",u:"UC",lect:20,m1:30,hist:10,cien:0,m2:0,nem:20,rank:20,nota:""},
+  {n:"Agronomía e Ingeniería Forestal",u:"UC",lect:10,m1:30,hist:10,cien:10,m2:0,nem:20,rank:30,nota:""},
+  {n:"Antropología-Arqueología",u:"UC",lect:20,m1:20,hist:15,cien:0,m2:0,nem:20,rank:25,nota:""},
+  {n:"Arquitectura",u:"UC",lect:15,m1:35,hist:10,cien:0,m2:0,nem:20,rank:20,nota:""},
+  {n:"Arte",u:"UC",lect:20,m1:15,hist:15,cien:0,m2:0,nem:20,rank:30,nota:""},
+  {n:"Astronomía",u:"UC",lect:10,m1:35,hist:0,cien:15,m2:0,nem:20,rank:20,nota:""},
+  {n:"Biología",u:"UC",lect:10,m1:25,hist:0,cien:25,m2:0,nem:20,rank:20,nota:""},
+  {n:"Biología Marina",u:"UC",lect:10,m1:25,hist:0,cien:25,m2:0,nem:20,rank:20,nota:""},
+  {n:"Bioquímica",u:"UC",lect:10,m1:30,hist:0,cien:20,m2:0,nem:20,rank:20,nota:""},
+  {n:"Ciencia Política",u:"UC",lect:20,m1:20,hist:15,cien:0,m2:0,nem:20,rank:25,nota:""},
+  {n:"Construcción Civil",u:"UC",lect:10,m1:40,hist:0,cien:10,m2:0,nem:20,rank:20,nota:""},
+  {n:"Derecho",u:"UC",lect:25,m1:10,hist:25,cien:0,m2:0,nem:20,rank:20,nota:""},
+  {n:"Diseño",u:"UC",lect:20,m1:20,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Enfermería",u:"UC",lect:10,m1:20,hist:0,cien:25,m2:0,nem:20,rank:25,nota:""},
+  {n:"Estadística",u:"UC",lect:10,m1:45,hist:0,cien:10,m2:5,nem:20,rank:10,nota:""},
+  {n:"Filosofía",u:"UC",lect:25,m1:15,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Física",u:"UC",lect:10,m1:45,hist:0,cien:15,m2:0,nem:20,rank:10,nota:""},
+  {n:"Fonoaudiología",u:"UC",lect:10,m1:20,hist:0,cien:25,m2:0,nem:20,rank:25,nota:""},
+  {n:"Geografía",u:"UC",lect:20,m1:25,hist:15,cien:0,m2:0,nem:20,rank:20,nota:""},
+  {n:"Historia",u:"UC",lect:15,m1:10,hist:35,cien:0,m2:0,nem:20,rank:20,nota:""},
+  {n:"Ingeniería Civil",u:"UC",lect:10,m1:25,hist:0,cien:15,m2:10,nem:20,rank:20,nota:"Requiere M2"},
+  {n:"Ingeniería Comercial",u:"UC",lect:10,m1:30,hist:10,cien:0,m2:10,nem:20,rank:20,nota:"Requiere M2"},
+  {n:"Kinesiología",u:"UC",lect:10,m1:20,hist:0,cien:25,m2:0,nem:20,rank:25,nota:""},
+  {n:"Matemática",u:"UC",lect:10,m1:45,hist:0,cien:15,m2:0,nem:20,rank:10,nota:""},
+  {n:"Medicina",u:"UC",lect:15,m1:20,hist:0,cien:25,m2:0,nem:20,rank:20,nota:""},
+  {n:"Medicina Veterinaria",u:"UC",lect:20,m1:25,hist:0,cien:15,m2:0,nem:20,rank:20,nota:""},
+  {n:"Nutrición y Dietética",u:"UC",lect:10,m1:20,hist:0,cien:25,m2:0,nem:20,rank:25,nota:""},
+  {n:"Odontología",u:"UC",lect:10,m1:20,hist:0,cien:25,m2:0,nem:20,rank:25,nota:""},
+  {n:"Periodismo",u:"UC",lect:25,m1:20,hist:15,cien:0,m2:0,nem:15,rank:25,nota:""},
+  {n:"Psicología",u:"UC",lect:10,m1:20,hist:20,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Química",u:"UC",lect:10,m1:35,hist:0,cien:15,m2:0,nem:20,rank:20,nota:""},
+  {n:"Química y Farmacia",u:"UC",lect:10,m1:35,hist:0,cien:15,m2:0,nem:20,rank:20,nota:""},
+  {n:"Sociología",u:"UC",lect:20,m1:20,hist:15,cien:0,m2:0,nem:20,rank:25,nota:""},
+  {n:"Trabajo Social",u:"UC",lect:15,m1:15,hist:20,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Terapia Ocupacional",u:"UC",lect:20,m1:20,hist:0,cien:20,m2:0,nem:20,rank:20,nota:""},
+  {n:"Derecho",u:"U. de Chile",lect:30,m1:5,hist:15,cien:0,m2:0,nem:10,rank:10,nota:""},
+  {n:"Medicina",u:"U. de Chile",lect:10,m1:10,hist:0,cien:25,m2:15,nem:20,rank:20,nota:"Requiere M2"},
+  {n:"Ingeniería Civil",u:"U. de Chile",lect:10,m1:20,hist:0,cien:0,m2:20,nem:10,rank:10,nota:"Requiere M2"},
+  {n:"Ingeniería Comercial",u:"U. de Chile",lect:20,m1:20,hist:10,cien:0,m2:0,nem:20,rank:20,nota:""},
+  {n:"Psicología",u:"U. de Chile",lect:25,m1:10,hist:15,cien:0,m2:0,nem:10,rank:10,nota:""},
+  {n:"Arquitectura",u:"U. de Chile",lect:20,m1:20,hist:10,cien:0,m2:0,nem:20,rank:20,nota:""},
+  {n:"Odontología",u:"U. de Chile",lect:10,m1:10,hist:0,cien:30,m2:0,nem:10,rank:10,nota:"Requiere Ciencias"},
+  {n:"Enfermería",u:"U. de Chile",lect:10,m1:20,hist:0,cien:20,m2:0,nem:20,rank:20,nota:""},
+  {n:"Bioquímica",u:"U. de Chile",lect:10,m1:25,hist:0,cien:20,m2:15,nem:15,rank:15,nota:"Requiere M2"},
+  {n:"Kinesiología",u:"U. de Chile",lect:15,m1:10,hist:0,cien:25,m2:0,nem:10,rank:10,nota:"Requiere Ciencias"},
+  {n:"Nutrición y Dietética",u:"U. de Chile",lect:15,m1:10,hist:0,cien:25,m2:0,nem:10,rank:10,nota:""},
+  {n:"Trabajo Social",u:"U. de Chile",lect:25,m1:10,hist:15,cien:0,m2:0,nem:10,rank:10,nota:""},
+  {n:"Periodismo",u:"U. de Chile",lect:30,m1:10,hist:10,cien:0,m2:0,nem:10,rank:10,nota:""},
+  {n:"Obstetricia",u:"U. de Chile",lect:15,m1:15,hist:0,cien:20,m2:0,nem:20,rank:20,nota:""},
+  {n:"Fonoaudiología",u:"U. de Chile",lect:20,m1:10,hist:0,cien:20,m2:0,nem:20,rank:20,nota:""},
+  {n:"Terapia Ocupacional",u:"U. de Chile",lect:20,m1:10,hist:0,cien:20,m2:0,nem:20,rank:20,nota:""},
+  {n:"Química y Farmacia",u:"U. de Chile",lect:10,m1:20,hist:0,cien:20,m2:10,nem:20,rank:20,nota:"Requiere M2"},
+  {n:"Geología",u:"U. de Chile",lect:10,m1:25,hist:0,cien:15,m2:10,nem:20,rank:20,nota:"Requiere M2"},
+  {n:"Astronomía",u:"U. de Chile",lect:10,m1:30,hist:0,cien:15,m2:15,nem:15,rank:15,nota:"Requiere M2"},
+  {n:"Ingeniería Civil Industrial",u:"U. de Santiago",lect:10,m1:30,hist:0,cien:10,m2:10,nem:20,rank:20,nota:"Requiere M2"},
+  {n:"Ingeniería Comercial",u:"U. de Santiago",lect:20,m1:20,hist:10,cien:0,m2:0,nem:20,rank:20,nota:""},
+  {n:"Contador Auditor",u:"U. de Santiago",lect:20,m1:20,hist:10,cien:0,m2:0,nem:20,rank:20,nota:""},
+  {n:"Derecho",u:"U. de Santiago",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Psicología",u:"U. de Santiago",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Química y Farmacia",u:"U. de Santiago",lect:10,m1:20,hist:0,cien:20,m2:10,nem:20,rank:20,nota:""},
+  {n:"Ingeniería en Informática",u:"U. de Santiago",lect:10,m1:30,hist:0,cien:10,m2:10,nem:20,rank:20,nota:""},
+  {n:"Medicina",u:"U. de Santiago",lect:10,m1:20,hist:0,cien:20,m2:10,nem:20,rank:20,nota:""},
+  {n:"Trabajo Social",u:"U. de Santiago",lect:25,m1:15,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Derecho",u:"PUC Valparaíso",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Ingeniería Civil",u:"PUC Valparaíso",lect:10,m1:30,hist:0,cien:10,m2:10,nem:20,rank:20,nota:"Requiere M2"},
+  {n:"Psicología",u:"PUC Valparaíso",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Medicina",u:"PUC Valparaíso",lect:10,m1:20,hist:0,cien:20,m2:10,nem:20,rank:20,nota:""},
+  {n:"Arquitectura",u:"PUC Valparaíso",lect:20,m1:20,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Periodismo",u:"PUC Valparaíso",lect:30,m1:10,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Ingeniería Comercial",u:"PUC Valparaíso",lect:20,m1:20,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Derecho",u:"U. de los Andes",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Medicina",u:"U. de los Andes",lect:10,m1:20,hist:0,cien:20,m2:10,nem:20,rank:20,nota:""},
+  {n:"Ingeniería Comercial",u:"U. de los Andes",lect:20,m1:20,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Psicología",u:"U. de los Andes",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Derecho",u:"U. Diego Portales",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Periodismo",u:"U. Diego Portales",lect:30,m1:10,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Psicología",u:"U. Diego Portales",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Ingeniería Comercial",u:"U. Diego Portales",lect:20,m1:20,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Ingeniería Comercial",u:"U. Adolfo Ibáñez",lect:20,m1:20,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Derecho",u:"U. Adolfo Ibáñez",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Psicología",u:"U. Adolfo Ibáñez",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Derecho",u:"U. de Talca",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Ingeniería Civil Industrial",u:"U. de Talca",lect:10,m1:30,hist:0,cien:10,m2:10,nem:20,rank:20,nota:""},
+  {n:"Psicología",u:"U. de Talca",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Medicina",u:"U. de Talca",lect:10,m1:20,hist:0,cien:20,m2:10,nem:20,rank:20,nota:""},
+  {n:"Derecho",u:"U. de Concepción",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Medicina",u:"U. de Concepción",lect:10,m1:20,hist:0,cien:20,m2:10,nem:20,rank:20,nota:""},
+  {n:"Ingeniería Civil",u:"U. de Concepción",lect:10,m1:30,hist:0,cien:10,m2:10,nem:20,rank:20,nota:""},
+  {n:"Psicología",u:"U. de Concepción",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Odontología",u:"U. de Concepción",lect:10,m1:10,hist:0,cien:30,m2:0,nem:25,rank:25,nota:""},
+  {n:"Medicina",u:"U. de la Frontera",lect:10,m1:20,hist:0,cien:20,m2:10,nem:20,rank:20,nota:""},
+  {n:"Odontología",u:"U. de la Frontera",lect:10,m1:10,hist:0,cien:30,m2:0,nem:25,rank:25,nota:""},
+  {n:"Derecho",u:"U. de la Frontera",lect:25,m1:10,hist:15,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Ingeniería Civil",u:"U. del Bío-Bío",lect:10,m1:30,hist:0,cien:10,m2:10,nem:20,rank:20,nota:""},
+  {n:"Arquitectura",u:"U. del Bío-Bío",lect:20,m1:20,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Ingeniería Civil Industrial",u:"U. Tecnológica Met.",lect:10,m1:30,hist:0,cien:10,m2:10,nem:20,rank:20,nota:""},
+  {n:"Contador Auditor",u:"U. Tecnológica Met.",lect:20,m1:20,hist:10,cien:0,m2:0,nem:25,rank:25,nota:""},
+  {n:"Ingeniería Civil",u:"U. Téc. F. Santa María",lect:10,m1:30,hist:0,cien:10,m2:10,nem:20,rank:20,nota:"Requiere M2"},
+  {n:"Ingeniería Comercial",u:"U. Téc. F. Santa María",lect:20,m1:20,hist:10,cien:0,m2:0,nem:20,rank:20,nota:""},
+  {n:"Ingeniería Civil en Informática",u:"U. Téc. F. Santa María",lect:10,m1:30,hist:0,cien:10,m2:10,nem:20,rank:20,nota:""}
+];
+
+function filtrarCarreras(){
+  const q=document.getElementById('carrera-search').value.toLowerCase().trim();
+  const res=document.getElementById('carrera-results');
+  if(!q){res.style.display='none';return;}
+  const filtradas=DB.filter(c=>c.n.toLowerCase().includes(q)||c.u.toLowerCase().includes(q)).slice(0,8);
+  if(!filtradas.length){res.innerHTML='<div style="padding:10px 14px;font-size:13px;color:#5a6e8c">No encontrada — ingresa los % manualmente</div>';res.style.display='block';return;}
+  res.innerHTML=filtradas.map((c,i)=>`<div onclick="usarCarrera(${DB.indexOf(c)})" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f0f4fb;font-size:13px;transition:background .15s" onmouseover="this.style.background='#f2f5fb'" onmouseout="this.style.background='#fff'"><strong style="color:#003087">${c.n}</strong> <span style="color:#5a6e8c">— ${c.u}</span></div>`).join('');
+  res.style.display='block';
+}
+
+function usarCarrera(idx){
+  const c=DB[idx];
+  // Actualizar porcentajes
+  const map={lect:'lect',m1:'m1',m2:'m2',hist:'hist',cien:'cien',nem:'nem2',rank:'rank'};
+  Object.keys(map).forEach(k=>{
+    const el=v('pp-'+map[k]);
+    if(el){el.value=c[k];el.style.background='#e8eef7';}
+  });
+  updateTotal();
+  document.getElementById('carrera-search').value=c.n+' — '+c.u;
+  document.getElementById('carrera-results').style.display='none';
+  if(c.nota){
+    const notice=document.createElement('div');
+    notice.style.cssText='font-size:12px;color:#c8a951;background:#fff9e6;padding:8px 12px;border-radius:8px;margin-bottom:8px;font-weight:600';
+    notice.textContent='⚠️ '+c.nota;
+    notice.id='carrera-notice';
+    const old=document.getElementById('carrera-notice');
+    if(old)old.remove();
+    document.getElementById('pond-rows').before(notice);
+  }
+}
+
 buildPondRows(null);
 </script>
 </body>
