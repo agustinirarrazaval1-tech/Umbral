@@ -224,14 +224,15 @@ let grupo='A';
 function toggleMenu(){document.getElementById('ham').classList.toggle('open');document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
 function closeMenu(){document.getElementById('ham').classList.remove('open');document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
 function goPage(p){
+  if(p==='ranking'){
+    window.open('https://turanking.cl','_blank');
+    return;
   closeMenu();
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.getElementById('page-'+p).classList.add('active');
   document.querySelectorAll('.sidebar-item').forEach(x=>x.classList.remove('active'));
   const ni=document.getElementById('nav-'+p);if(ni)ni.classList.add('active');
-  if(p==='ranking'){
-    window.open('https://turanking.cl','_blank');
-    return;
+  
   }
 }
 function setG(g,btn){grupo=g;document.querySelectorAll('.gb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('gdesc').textContent=GDESC[g];}
